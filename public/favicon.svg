@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F5A45C" />
+      <stop offset="1" stop-color="#E88A3E" />
+    </linearGradient>
+    <clipPath id="c">
+      <rect x="2" y="2" width="60" height="60" rx="15" />
+    </clipPath>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#g)" />
+  <g clip-path="url(#c)">
+    <circle cx="42" cy="22" r="10" fill="#FFF3E6" opacity=".92" />
+    <path d="M0 46 L16 30 L26 41 L38 26 L56 46 L64 40 L64 64 L0 64 Z" fill="#1D353C" />
+  </g>
+  <g>
+    <path d="M12 40 h26 a5 5 0 0 1 5 5 v6 h-36 v-6 a5 5 0 0 1 5 -5 z" fill="#F8F6F2" />
+    <rect x="15" y="34" width="13" height="8" rx="2.5" fill="#F8F6F2" />
+    <rect x="17" y="36" width="4.5" height="4" rx="1" fill="#2F6E80" />
+    <rect x="23" y="36" width="4.5" height="4" rx="1" fill="#2F6E80" />
+    <rect x="31" y="43" width="9" height="4" rx="1.4" fill="#2F6E80" />
+    <circle cx="19" cy="52" r="5" fill="#121A1D" />
+    <circle cx="19" cy="52" r="2" fill="#F8F6F2" />
+    <circle cx="39" cy="52" r="5" fill="#121A1D" />
+    <circle cx="39" cy="52" r="2" fill="#F8F6F2" />
+  </g>
+</svg>
