@@ -1,18 +1,30 @@
 /**
  * SHARED BUSINESS DETAILS
  * -------------------------------------------------------------
- * Edit the phone number, e-mail and social links in ONE place —
+ * Edit the phone numbers, e-mail and social links in ONE place —
  * every component picks them up automatically.
+ *
+ * Source: Karnail Tour and Travels developer brief (business card data).
  */
 export const CONTACT = {
   brand: 'Karnail Tour and Travels',
   tagline: 'Your Journey, Our Commitment.',
-  phoneDisplay: '+91 98765 43210',
-  phoneDial: '+919876543210',
-  /** Digits only — used to build the wa.me link */
-  whatsappNumber: '919876543210',
-  email: 'info@karnailtravels.com',
-  address: 'Mohali, Punjab',
+
+  /** All business lines — rendered as tap-to-call links in footer & enquiry. */
+  phones: [
+    { display: '+91 98156 66135', dial: '+919815666135' },
+    { display: '+91 99148 63778', dial: '+919914863778' },
+    { display: '+91 98973 20111', dial: '+919897320111' },
+  ],
+
+  /** Primary line — used wherever a single number is shown. */
+  phoneDisplay: '+91 98156 66135',
+  phoneDial: '+919815666135',
+
+  /** Digits only (country code + number) — used to build the wa.me link */
+  whatsappNumber: '919815666135',
+  email: 'karnailtours55@gmail.com',
+  address: 'Chandigarh, India',
   copyright: '© 2026 Karnail Tour and Travels. All rights reserved.',
   signoff: 'Travel Safe, Travel Happy.',
 }

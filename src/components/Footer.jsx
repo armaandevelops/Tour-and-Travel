@@ -112,11 +112,15 @@ export default function Footer() {
         <div>
           <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-white">Contact Info</h3>
           <ul className="mt-4 space-y-3 text-sm text-cream/75">
-            <li>
-              <a href={`tel:${CONTACT.phoneDial}`} className="flex items-center gap-2.5 transition-colors hover:text-flame">
-                <Phone size={14} className="shrink-0 text-flame" />
-                {CONTACT.phoneDisplay}
-              </a>
+            <li className="flex items-start gap-2.5">
+              <Phone size={14} className="mt-1 shrink-0 text-flame" />
+              <span className="flex flex-col gap-1">
+                {CONTACT.phones.map((line) => (
+                  <a key={line.dial} href={`tel:${line.dial}`} className="transition-colors hover:text-flame">
+                    {line.display}
+                  </a>
+                ))}
+              </span>
             </li>
             <li>
               <a

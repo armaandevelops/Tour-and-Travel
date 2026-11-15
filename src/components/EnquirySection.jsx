@@ -192,16 +192,21 @@ export default function EnquirySection({ prefill }) {
           <div className="border-t border-line p-7 sm:p-8">
             <h3 className="font-display text-lg font-bold text-ink">Get in Touch</h3>
             <ul className="mt-4 space-y-3.5">
-              <li>
-                <a
-                  href={`tel:${CONTACT.phoneDial}`}
-                  className="group flex items-center gap-3 text-sm font-medium text-ink transition-colors hover:text-flame"
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-flame/12 text-flame transition-colors group-hover:bg-flame group-hover:text-white">
-                    <Phone size={15} />
-                  </span>
-                  {CONTACT.phoneDisplay}
-                </a>
+              <li className="flex items-start gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-flame/12 text-flame">
+                  <Phone size={15} />
+                </span>
+                <span className="flex flex-col gap-1.5 pt-0.5">
+                  {CONTACT.phones.map((line) => (
+                    <a
+                      key={line.dial}
+                      href={`tel:${line.dial}`}
+                      className="text-sm font-medium text-ink transition-colors hover:text-flame"
+                    >
+                      {line.display}
+                    </a>
+                  ))}
+                </span>
               </li>
               <li>
                 <a
@@ -290,7 +295,7 @@ export default function EnquirySection({ prefill }) {
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
-                  placeholder="e.g. 98765 43210"
+                  placeholder="e.g. 98156 66135"
                   className={inputClass('phone')}
                   value={form.phone}
                   onChange={(event) => update('phone', event.target.value)}

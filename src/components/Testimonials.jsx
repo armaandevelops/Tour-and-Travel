@@ -1,11 +1,16 @@
 /**
  * TESTIMONIALS
  * -------------------------------------------------------------
- * Carousel with interactive dots. Desktop shows 3 cards per slide,
- * smaller screens show 1. The carousel gently auto-rotates and
- * pauses while you hover over it.
+ * Swipeable review strip built on native CSS scroll-snap, so it
+ * feels right on touch screens (swipe/drag with momentum) and
+ * still works with a trackpad or the keyboard arrows.
+ *
+ * Desktop (lg+) shows 3 cards per view, smaller screens show 1
+ * large card with the next one peeking in. Dots follow the
+ * scroll position and the strip gently auto-rotates until you
+ * interact with it (hover, touch or focus).
  */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Quote } from 'lucide-react'
 import { SectionEyebrow } from './ui'
 
@@ -81,29 +86,162 @@ const AUTO_ROTATE_MS = 6000
 export default function Testimonials() {
   const [page, setPage] = useState(0)
   const [paused, setPaused] = useState(false)
-  const [perView, setPerView] = useState(3)
+  const [perView, setPerView] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches ? 3 : 1,
+  )
 
-  /* 3 cards per slide on desktop, 1 card on smaller screens */
+  const trackRef = useRef(null)
+  const pageRef = useRef(0)
+  const perViewRef = useRef(perView)
+  const scrollTimer = useRef(null)
+  const animRef = useRef(null)
+
+  const pages = Math.max(1, Math.ceil(TESTIMONIALS.length / perView))
+
+  /* Stop any in-flight programmatic scroll and restore snapping */
+  const cancelAnim = useCallback(() => {
+    const anim = animRef.current
+    if (anim) {
+      cancelAnimationFrame(anim.raf)
+      clearTimeout(anim.timer)
+      animRef.current = null
+    }
+    const track = trackRef.current
+    if (track && track.style.scrollSnapType) track.style.scrollSnapType = ''
+  }, [])
+
+  /**
+   * Smoothly scroll the strip to an exact offset.
+   * Native `behavior: 'smooth'` collides with mandatory scroll-snap (the snap
+   * controller retargets the animation and it stalls), so we tween scrollLeft
+   * ourselves with snapping temporarily switched off. The final offset is an
+   * exact snap position, so re-enabling snap never nudges the layout.
+   * A timer fallback finishes the tween even when rAF is suspended (hidden
+   * or occluded browser windows).
+   */
+  const animateTo = useCallback(
+    (target) => {
+      const track = trackRef.current
+      if (!track) return
+      cancelAnim()
+      const from = track.scrollLeft
+      const delta = target - from
+      if (Math.abs(delta) < 2) {
+        track.scrollLeft = target
+        return
+      }
+      track.style.scrollSnapType = 'none'
+      const duration = Math.min(600, 320 + Math.abs(delta) * 0.06)
+      const start = performance.now()
+      const anim = { raf: 0, timer: 0 }
+      const done = () => {
+        if (animRef.current !== anim) return
+        cancelAnimationFrame(anim.raf)
+        clearTimeout(anim.timer)
+        animRef.current = null
+        track.scrollLeft = target
+        track.style.scrollSnapType = ''
+      }
+      const step = (now) => {
+        if (animRef.current !== anim) return
+        const p = Math.min(1, (now - start) / duration)
+        if (p >= 1) {
+          done()
+          return
+        }
+        track.scrollLeft = from + delta * (1 - (1 - p) ** 3)
+        anim.raf = requestAnimationFrame(step)
+      }
+      animRef.current = anim
+      anim.raf = requestAnimationFrame(step)
+      anim.timer = setTimeout(done, duration + 120)
+    },
+    [cancelAnim],
+  )
+
+  /* 3 cards per view on desktop, 1 card on smaller screens */
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1024px)')
-    const update = () => setPerView(media.matches ? 3 : 1)
+    const update = () => {
+      const next = media.matches ? 3 : 1
+      if (perViewRef.current !== next) {
+        perViewRef.current = next
+        setPerView(next)
+        /* Jump back to the first card when the layout changes so dots and scroll never disagree */
+        pageRef.current = 0
+        setPage(0)
+        cancelAnim()
+        trackRef.current?.scrollTo({ left: 0, behavior: 'auto' })
+      }
+    }
     update()
     media.addEventListener('change', update)
     return () => media.removeEventListener('change', update)
-  }, [])
+  }, [cancelAnim])
 
-  const pages = Math.max(1, Math.ceil(TESTIMONIALS.length / perView))
-  /* Clamp during render so resizing the window can never leave us on a missing page */
-  const activePage = Math.min(page, pages - 1)
+  const scrollToPage = useCallback(
+    (index) => {
+      const track = trackRef.current
+      const card = track?.children[index * perView]
+      if (!track || !card) return
+      /* Scroll offset of the card inside the track (independent of offset parents) */
+      const target = card.getBoundingClientRect().left - track.getBoundingClientRect().left + track.scrollLeft
+      animateTo(target)
+    },
+    [perView, animateTo],
+  )
 
-  /* Auto-rotate unless the user is hovering */
+  const goTo = useCallback(
+    (index) => {
+      pageRef.current = index
+      setPage(index)
+      scrollToPage(index)
+    },
+    [scrollToPage],
+  )
+
+  /* Keep the dots in sync while the user swipes (debounced) */
+  const handleScroll = () => {
+    if (scrollTimer.current) clearTimeout(scrollTimer.current)
+    scrollTimer.current = setTimeout(() => {
+      const track = trackRef.current
+      if (!track) return
+      const trackLeft = track.getBoundingClientRect().left
+      let best = 0
+      let bestDist = Infinity
+      Array.from(track.children).forEach((card, index) => {
+        const dist = Math.abs(card.getBoundingClientRect().left - trackLeft)
+        if (dist < bestDist) {
+          bestDist = dist
+          best = index
+        }
+      })
+      const next = Math.min(Math.floor(best / perViewRef.current), pages - 1)
+      if (next !== pageRef.current) {
+        pageRef.current = next
+        setPage(next)
+      }
+    }, 120)
+  }
+
+  useEffect(
+    () => () => {
+      clearTimeout(scrollTimer.current)
+      cancelAnim()
+    },
+    [cancelAnim],
+  )
+
+  /* Auto-rotate unless the user is hovering, touching or focusing the strip */
   useEffect(() => {
     if (paused) return undefined
-    const timer = setInterval(() => setPage((current) => (Math.min(current, pages - 1) + 1) % pages), AUTO_ROTATE_MS)
+    const timer = setInterval(() => goTo((pageRef.current + 1) % pages), AUTO_ROTATE_MS)
     return () => clearInterval(timer)
-  }, [paused, pages])
+  }, [paused, pages, goTo])
 
-  const visible = TESTIMONIALS.slice(activePage * perView, activePage * perView + perView)
+  /* Pause auto-rotate while interacting */
+  const pause = () => setPaused(true)
+  const resume = () => setPaused(false)
 
   return (
     <section className="container-x py-12 lg:py-16">
@@ -112,18 +250,28 @@ export default function Testimonials() {
         <h2 className="section-title mt-4">What Our Customers Say</h2>
       </div>
 
-      <div
-        className="mt-8"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
-      >
-        <div key={`${activePage}-${perView}`} className="animate-fade-in grid gap-4 lg:grid-cols-3">
-          {visible.map((item) => (
+      <div className="mt-8" onMouseEnter={pause} onMouseLeave={resume} onFocus={pause} onBlur={resume}>
+        {/* ---- Swipeable strip ---- */}
+        <div
+          ref={trackRef}
+          onScroll={handleScroll}
+          onTouchStart={() => {
+            cancelAnim()
+            setPaused(true)
+          }}
+          onTouchEnd={resume}
+          onTouchCancel={resume}
+          tabIndex={0}
+          role="region"
+          aria-label="Customer reviews — scrollable"
+          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 [scroll-behavior:auto]"
+        >
+          {TESTIMONIALS.map((item, index) => (
             <figure
               key={item.id}
-              className="flex flex-col rounded-xl border border-line bg-surface p-6 shadow-sm transition-shadow hover:shadow-[0_24px_40px_-32px_rgba(18,26,29,0.6)]"
+              className={`flex w-[86%] shrink-0 flex-col rounded-xl border border-line bg-surface p-6 shadow-sm transition-shadow hover:shadow-[0_24px_40px_-32px_rgba(18,26,29,0.6)] lg:w-[calc((100%_-_2rem)/3)] ${
+                index === TESTIMONIALS.length - 1 ? 'snap-end' : 'snap-start'
+              }`}
             >
               <Quote size={30} className="text-flame fill-flame" strokeWidth={1.5} aria-hidden="true" />
               <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-ink">&ldquo;{item.quote}&rdquo;</blockquote>
@@ -139,16 +287,16 @@ export default function Testimonials() {
         </div>
 
         {/* ---- Dots ---- */}
-        <div className="mt-7 flex items-center justify-center gap-2.5">
+        <div className="mt-4 flex items-center justify-center gap-2.5">
           {Array.from({ length: pages }).map((_, index) => (
             <button
               key={index}
               type="button"
-              onClick={() => setPage(index)}
+              onClick={() => goTo(index)}
               aria-label={`Go to slide ${index + 1} of ${pages}`}
-              aria-current={index === activePage}
+              aria-current={index === page}
               className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                index === activePage ? 'scale-110 bg-flame' : 'bg-line hover:bg-flame/50'
+                index === page ? 'scale-110 bg-flame' : 'bg-line hover:bg-flame/50'
               }`}
             />
           ))}
