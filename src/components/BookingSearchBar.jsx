@@ -175,7 +175,7 @@ export default function BookingSearchBar({ onSendToEnquiry }) {
       className="rounded-2xl border border-line bg-surface p-4 shadow-[0_28px_60px_-30px_rgba(18,26,29,0.5)] sm:p-5"
     >
       {/* ---- Tabs ---- */}
-      <div className="-mx-1 flex gap-1 overflow-x-auto border-b border-line px-1 sm:gap-2">
+      <div className="-mx-1 flex gap-1 overflow-x-auto border-b border-line px-1 no-scrollbar sm:gap-2">
         {TABS.map(({ id, label, icon: Icon }) => {
           const isActive = tab === id
           return (
@@ -197,7 +197,7 @@ export default function BookingSearchBar({ onSendToEnquiry }) {
       </div>
 
       {/* ---- Inputs ---- */}
-      <form onSubmit={handleSubmit} noValidate className={`mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 ${gridClass}`}>
+      <form onSubmit={handleSubmit} noValidate className={`mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 ${gridClass}`}>
         {fields.map((field) => {
           const isDate = field.type === 'date'
           const dateOpen = isDate && (focusedField === field.name || Boolean(values[field.name]))
@@ -256,7 +256,11 @@ export default function BookingSearchBar({ onSendToEnquiry }) {
           )
         })}
 
-        <div className="flex flex-col justify-end sm:col-span-2 lg:col-span-1">
+        {/* The button slots into the grid next to the last field
+            (or spans a full extra row when a tab shows 4 fields). */}
+        <div
+          className={`flex flex-col justify-end lg:col-span-1 ${fields.length >= 4 ? 'sm:col-span-2 md:col-span-2' : 'md:col-span-3'}`}
+        >
           <button type="submit" className="btn btn-flame w-full py-[0.95rem]">
             Book Ride
             <ArrowRight size={16} />

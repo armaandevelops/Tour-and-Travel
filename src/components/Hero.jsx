@@ -3,7 +3,11 @@
  * -------------------------------------------------------------
  * Full-width photo banner with the headline, the two calls to
  * action and the booking search bar (passed in as `children`
- * from App.jsx so the card can overlap the bottom of the image).
+ * from App.jsx).
+ *
+ * The section is at least (100svh − navbar) tall and centres its
+ * content, so on first load the whole booking bar is visible on
+ * any screen — short laptops, tall phones or large monitors.
  */
 import { ArrowRight } from 'lucide-react'
 import { scrollToId } from './ui'
@@ -19,7 +23,10 @@ const SUBTITLE =
 
 export default function Hero({ children }) {
   return (
-    <section id="home" className="relative isolate overflow-hidden">
+    <section
+      id="home"
+      className="relative isolate flex min-h-[calc(100svh_-_4rem)] flex-col justify-center overflow-hidden lg:min-h-[calc(100svh_-_70px)]"
+    >
       {/* Background photograph */}
       <img
         src={HERO_IMAGE}
@@ -31,22 +38,25 @@ export default function Hero({ children }) {
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,rgba(18,26,29,0.97)_0%,rgba(18,26,29,0.9)_30%,rgba(18,26,29,0.7)_55%,rgba(18,26,29,0.35)_80%,rgba(18,26,29,0.2)_100%)]" />
       <div className="absolute inset-0 -z-10 bg-black/15" />
 
-      <div className="container-x relative pb-7 pt-14 sm:pt-16 lg:pb-8 lg:pt-24">
+      {/* Vertical rhythm scales with the viewport height so the whole
+          booking bar stays above the fold on first load (short laptop
+          screens as well as tall monitors). */}
+      <div className="container-x relative w-full py-[clamp(1.25rem,4vh,3rem)]">
         <div className="max-w-[560px]">
           <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/80">
             {EYEBROW}
             <span className="h-px w-14 bg-flame" aria-hidden="true" />
           </p>
 
-          <h1 className="mt-5 font-display text-[2.5rem] font-bold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-[3.75rem]">
+          <h1 className="mt-4 font-display text-[clamp(1.85rem,9.5vw,2.5rem)] font-bold leading-[1.05] tracking-tight text-ink sm:mt-5 sm:text-5xl lg:text-[clamp(3rem,9vh,3.75rem)]">
             {HEADLINE_TOP}
             <br />
             Our <span className="italic text-flame">{HEADLINE_ACCENT}</span>
           </h1>
 
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-muted">{SUBTITLE}</p>
+          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-muted sm:mt-5">{SUBTITLE}</p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
             <button type="button" onClick={() => scrollToId('book')} className="btn btn-flame">
               Book Now
               <ArrowRight size={16} />
@@ -58,7 +68,7 @@ export default function Hero({ children }) {
         </div>
 
         {/* Booking search bar sits on the photo at the bottom of the hero */}
-        <div className="mt-10 lg:mt-14">{children}</div>
+        <div className="mt-[clamp(1.5rem,6vh,3.5rem)]">{children}</div>
       </div>
     </section>
   )

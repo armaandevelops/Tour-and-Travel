@@ -52,7 +52,7 @@ const QUICK_LINKS = [
   { label: 'Destinations', id: 'destinations' },
   { label: 'Our Fleet', id: 'fleet' },
   { label: 'Services', id: 'services' },
-  { label: 'About', id: 'about' },
+  { label: 'Why Us', id: 'about' },
   { label: 'Contact', id: 'contact' },
 ]
 
