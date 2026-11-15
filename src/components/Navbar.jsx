@@ -90,14 +90,14 @@ export default function Navbar() {
 
         {/* Actions ---------------------------------------------- */}
         <div className="flex items-center gap-2.5">
-          <button
+          {/* <button
             type="button"
             onClick={go('book')}
             className="btn btn-flame hidden px-5 py-3 sm:inline-flex"
           >
             Book a Ride
             <ArrowRight size={15} />
-          </button>
+          </button> */}
 
           {/* Mobile menu trigger */}
           <button

@@ -57,10 +57,10 @@ export default function Hero({ children }) {
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-muted sm:mt-5">{SUBTITLE}</p>
 
           <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
-            <button type="button" onClick={() => scrollToId('book')} className="btn btn-flame">
+            {/* <button type="button" onClick={() => scrollToId('book')} className="btn btn-flame">
               Book Now
               <ArrowRight size={16} />
-            </button>
+            </button> */}
             <button type="button" onClick={() => scrollToId('packages')} className="btn btn-outline">
               Explore Packages
             </button>
