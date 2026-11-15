@@ -377,7 +377,7 @@ export default function EnquirySection({ prefill }) {
               </div>
 
               <div className="flex flex-col gap-2.5 sm:col-span-2 sm:flex-row">
-                <button type="submit" disabled={submitting} className="btn btn-flame flex-1 px-5 py-3.5 disabled:cursor-not-allowed disabled:opacity-70">
+                {/* <button type="submit" disabled={submitting} className="btn btn-flame flex-1 px-5 py-3.5 disabled:cursor-not-allowed disabled:opacity-70">
                   {submitting ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
@@ -389,7 +389,7 @@ export default function EnquirySection({ prefill }) {
                       <ArrowRight size={16} />
                     </>
                   )}
-                </button>
+                </button> */}
 
                 <a
                   href={whatsappLink(buildWhatsAppMessage())}
