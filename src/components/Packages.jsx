@@ -96,13 +96,13 @@ export default function Packages({ onBookPackage }) {
                 </ul>
 
                 <div className="mt-auto">
-                  <p className="mt-4 border-t border-line pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                  {/* <p className="mt-4 border-t border-line pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted">
                     Starting at
                   </p>
                   <p className="mt-1 flex items-baseline gap-1.5">
                     <span className="font-display text-2xl font-bold text-flame">{pkg.price}</span>
                     <span className="text-xs text-muted">{pkg.priceNote}</span>
-                  </p>
+                  </p> */}
 
                   <button type="button" onClick={() => onBookPackage(pkg)} className="btn btn-flame mt-4 w-full">
                     Book Package
