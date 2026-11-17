@@ -14,7 +14,7 @@ export const CONTACT = {
   phones: [
     { display: '+91 98156 66135', dial: '+919815666135' },
     { display: '+91 99148 63778', dial: '+919914863778' },
-    { display: '+91 97791 66167 ', dial: '+919779166167 ' },
+    // { display: '+91 97791 66167 ', dial: '+919779166167 ' },
   ],
 
   /** Primary line — used wherever a single number is shown. */
